@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CountryMap } from "@/components/country-map";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Check, X } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -137,17 +137,43 @@ export default function Play() {
           <div className="flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-bottom-4">
             <h2 className="text-3xl font-serif font-bold text-center">{correctCountry.nameRu}</h2>
             <div className="w-full grid grid-cols-2 gap-4">
-              {options.map((opt) => (
-                <Card 
-                  key={opt.cca3}
-                  className={cn("transition-all duration-300 overflow-hidden", getOptionStyle(opt))}
-                  onClick={() => handleSelect(opt)}
-                >
-                  <div className="h-24 w-full bg-muted">
-                    <img src={opt.flags.png} alt="Флаг" className="w-full h-full object-cover" />
-                  </div>
-                </Card>
-              ))}
+              {options.map((opt) => {
+                const isCorrect = opt.cca3 === correctCountry.cca3;
+                const isPicked = selectedOption?.cca3 === opt.cca3;
+                const answered = !!selectedOption;
+                return (
+                  <button
+                    key={opt.cca3}
+                    onClick={() => handleSelect(opt)}
+                    disabled={answered}
+                    className={cn(
+                      "relative rounded-xl overflow-hidden bg-muted transition-all duration-300 outline-none",
+                      !answered && "ring-2 ring-border hover:ring-primary/50 cursor-pointer hover-elevate",
+                      answered && isCorrect && "ring-4 ring-green-500 scale-[1.03] shadow-lg shadow-green-500/30",
+                      answered && !isCorrect && isPicked && "ring-4 ring-red-500 scale-[0.97] shadow-lg shadow-red-500/30",
+                      answered && !isCorrect && !isPicked && "ring-2 ring-border opacity-40 grayscale",
+                    )}
+                  >
+                    <div className="h-24 w-full">
+                      <img src={opt.flags.png} alt="Флаг" className="w-full h-full object-cover" />
+                    </div>
+                    {answered && isCorrect && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-green-500/30">
+                        <div className="rounded-full bg-green-500 p-2 shadow-lg">
+                          <Check className="w-7 h-7 text-white" strokeWidth={3} />
+                        </div>
+                      </div>
+                    )}
+                    {answered && !isCorrect && isPicked && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-red-500/30">
+                        <div className="rounded-full bg-red-500 p-2 shadow-lg">
+                          <X className="w-7 h-7 text-white" strokeWidth={3} />
+                        </div>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         );
