@@ -222,3 +222,35 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* Map label styles */
+.geo-label {
+  font-family: var(--app-font-sans);
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+}
+.geo-label-primary {
+  font-weight: 700;
+  font-size: 13px;
+  color: hsl(0, 70%, 28%);
+  text-shadow:
+    -1px -1px 0 #fff, 1px -1px 0 #fff,
+    -1px  1px 0 #fff, 1px  1px 0 #fff,
+     0 0 6px #fff;
+}
+.geo-label-neighbor {
+  font-weight: 600;
+  font-size: 11px;
+  color: hsl(220, 25%, 28%);
+  text-shadow:
+    -1px -1px 0 #fff, 1px -1px 0 #fff,
+    -1px  1px 0 #fff, 1px  1px 0 #fff,
+     0 0 5px #fff;
+  opacity: 0.95;
+}
+.leaflet-container {
+  font-family: inherit;
+}

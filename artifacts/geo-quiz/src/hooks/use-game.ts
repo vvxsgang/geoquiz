@@ -43,6 +43,17 @@ export function useGame(countries: Country[] | undefined, mode: GameMode) {
     setScore(0);
     setSelectedOption(null);
     setIsGameOver(false);
+
+    // Preload all flag images for the round so they appear instantly
+    const seen = new Set<string>();
+    for (const q of newQuestions) {
+      for (const opt of [q.correctCountry, ...q.options]) {
+        if (seen.has(opt.cca3)) continue;
+        seen.add(opt.cca3);
+        const img = new Image();
+        img.src = opt.flags.png;
+      }
+    }
   };
 
   const handleSelect = (option: Country) => {

@@ -66,7 +66,7 @@ export default function Learn() {
           >
             <CardContent className="p-4 flex items-center gap-4">
               <div className="w-12 h-8 rounded shadow-sm overflow-hidden flex-shrink-0 bg-muted">
-                <img src={c.flags.svg} alt={c.flags.alt} className="w-full h-full object-cover" />
+                <img src={c.flags.png} alt={c.flags.alt} className="w-full h-full object-cover" />
               </div>
               <div>
                 <h3 className="font-semibold">{c.nameRu}</h3>
@@ -93,7 +93,7 @@ export default function Learn() {
           {selected && (
             <div className="flex flex-col">
               <div className="w-full h-48 bg-muted relative">
-                <img src={selected.flags.svg} alt={selected.flags.alt} className="w-full h-full object-cover opacity-90" />
+                <img src={selected.flags.png} alt={selected.flags.alt} className="w-full h-full object-cover opacity-90" />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
                 <div className="absolute bottom-4 left-6">
                   <DialogTitle className="text-2xl font-serif text-foreground">{selected.nameRu}</DialogTitle>

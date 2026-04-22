@@ -96,7 +96,7 @@ export default function Play() {
         return (
           <div className="flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-bottom-4">
             <div className="w-48 h-32 rounded-lg shadow-md overflow-hidden bg-muted">
-              <img src={correctCountry.flags.svg} alt="Флаг" className="w-full h-full object-cover" />
+              <img src={correctCountry.flags.png} alt="Флаг" className="w-full h-full object-cover" />
             </div>
             <div className="w-full grid grid-cols-1 gap-3">
               {options.map((opt) => (
@@ -144,7 +144,7 @@ export default function Play() {
                   onClick={() => handleSelect(opt)}
                 >
                   <div className="h-24 w-full bg-muted">
-                    <img src={opt.flags.svg} alt="Флаг" className="w-full h-full object-cover" />
+                    <img src={opt.flags.png} alt="Флаг" className="w-full h-full object-cover" />
                   </div>
                 </Card>
               ))}
