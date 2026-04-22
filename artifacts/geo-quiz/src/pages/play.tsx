@@ -110,8 +110,13 @@ export default function Play() {
                   className={cn("transition-all duration-300", getOptionStyle(opt))}
                   onClick={() => handleSelect(opt)}
                 >
-                  <CardContent className="p-4 text-center text-lg">
-                    {opt.nameRu}
+                  <CardContent className="p-4 flex items-center justify-center gap-3 text-lg">
+                    {selectedOption && (
+                      <div className="w-9 h-6 rounded-sm overflow-hidden bg-white ring-1 ring-border flex-shrink-0 flex items-center justify-center">
+                        <img src={opt.flagUrlSmall} alt="" className="w-full h-full object-contain" />
+                      </div>
+                    )}
+                    <span>{opt.nameRu}</span>
                   </CardContent>
                 </Card>
               ))}
@@ -129,8 +134,14 @@ export default function Play() {
                   className={cn("transition-all duration-300", getOptionStyle(opt))}
                   onClick={() => handleSelect(opt)}
                 >
-                  <CardContent className="p-4 text-center text-lg">
-                    {opt.capitalRu}
+                  <CardContent className="p-4 text-center">
+                    <div className="text-lg">{opt.capitalRu}</div>
+                    {selectedOption && (
+                      <div className="text-xs text-muted-foreground mt-1 flex items-center justify-center gap-1.5">
+                        <img src={opt.flagUrlSmall} alt="" className="w-4 h-3 object-contain" />
+                        <span>{opt.nameRu}</span>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}
@@ -162,6 +173,11 @@ export default function Play() {
                     <div className="aspect-[3/2] w-full bg-white flex items-center justify-center">
                       <img src={opt.flagUrl} alt="Флаг" className="w-full h-full object-contain" loading="eager" />
                     </div>
+                    {answered && (
+                      <div className="px-2 py-1.5 text-sm font-medium bg-card text-card-foreground border-t border-border text-center truncate">
+                        {opt.nameRu}
+                      </div>
+                    )}
                     {answered && isCorrect && (
                       <div className="absolute inset-0 flex items-center justify-center bg-green-500/30">
                         <div className="rounded-full bg-green-500 p-2 shadow-lg">
@@ -193,8 +209,18 @@ export default function Play() {
                   className={cn("transition-all duration-300", getOptionStyle(opt))}
                   onClick={() => handleSelect(opt)}
                 >
-                  <CardContent className="p-4 text-center text-lg">
-                    {opt.nameRu}
+                  <CardContent className="p-4 flex items-center justify-center gap-3">
+                    {selectedOption && (
+                      <div className="w-9 h-6 rounded-sm overflow-hidden bg-white ring-1 ring-border flex-shrink-0 flex items-center justify-center">
+                        <img src={opt.flagUrlSmall} alt="" className="w-full h-full object-contain" />
+                      </div>
+                    )}
+                    <div className="text-center">
+                      <div className="text-lg leading-tight">{opt.nameRu}</div>
+                      {selectedOption && (
+                        <div className="text-xs text-muted-foreground mt-0.5">столица — {opt.capitalRu}</div>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               ))}
