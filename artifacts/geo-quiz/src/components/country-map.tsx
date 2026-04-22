@@ -9,15 +9,22 @@ interface CountryMapProps {
   neighbors: Country[];
 }
 
-function MapController({ bounds, center }: { bounds: L.LatLngBounds | null; center: [number, number] }) {
+interface ViewPlan {
+  kind: "fit" | "center";
+  bounds: L.LatLngBounds | null;
+  center: [number, number];
+  zoom: number;
+}
+
+function MapController({ plan }: { plan: ViewPlan }) {
   const map = useMap();
   useEffect(() => {
     let cancelled = false;
     try {
-      if (bounds && bounds.isValid()) {
-        map.fitBounds(bounds.pad(0.55), { animate: true, maxZoom: 6 });
+      if (plan.kind === "fit" && plan.bounds && plan.bounds.isValid()) {
+        map.fitBounds(plan.bounds.pad(0.4), { animate: true, maxZoom: 6 });
       } else {
-        map.setView(center, 4, { animate: true });
+        map.setView(plan.center, plan.zoom, { animate: true });
       }
     } catch {
       // map may be tearing down
@@ -34,7 +41,7 @@ function MapController({ bounds, center }: { bounds: L.LatLngBounds | null; cent
       cancelled = true;
       clearTimeout(t);
     };
-  }, [map, bounds, center]);
+  }, [map, plan]);
   return null;
 }
 
@@ -47,6 +54,32 @@ export function CountryMap({ country, geoJson }: CountryMapProps) {
   );
 
   const bounds = feature ? L.geoJSON(feature as any).getBounds() : null;
+
+  // Compute span in degrees to detect tiny / island countries
+  const span = bounds && bounds.isValid()
+    ? Math.max(
+        bounds.getNorth() - bounds.getSouth(),
+        bounds.getEast() - bounds.getWest(),
+      )
+    : 0;
+
+  // Pick a sensible regional zoom based on country size
+  // span very small (Malta, Singapore, Bahrain): show wide regional view
+  // span small (small islands like Jamaica, Cyprus): show medium regional view
+  // otherwise: fitBounds normally
+  let plan: ViewPlan;
+  if (!bounds || !bounds.isValid()) {
+    plan = { kind: "center", bounds: null, center: country.latlng, zoom: 4 };
+  } else if (span < 1.5) {
+    plan = { kind: "center", bounds, center: country.latlng, zoom: 5 };
+  } else if (span < 4) {
+    plan = { kind: "center", bounds, center: country.latlng, zoom: 5 };
+  } else {
+    plan = { kind: "fit", bounds, center: country.latlng, zoom: 4 };
+  }
+
+  // For tiny/island countries, also draw a visible marker so it's findable at a wider zoom
+  const showLocator = !feature || span < 4;
 
   return (
     <div className="h-[300px] w-full relative z-0 overflow-hidden isolate">
@@ -68,30 +101,44 @@ export function CountryMap({ country, geoJson }: CountryMapProps) {
           subdomains={["a", "b", "c", "d"]}
         />
 
-        {feature ? (
+        {feature && (
           <GeoJSON
             data={feature as any}
             style={{
               color: "hsl(0, 72%, 45%)",
               weight: 2.5,
               fillColor: "hsl(0, 78%, 55%)",
-              fillOpacity: 0.45,
-            }}
-          />
-        ) : (
-          <CircleMarker
-            center={country.latlng}
-            radius={18}
-            pathOptions={{
-              color: "hsl(0, 72%, 45%)",
-              fillColor: "hsl(0, 78%, 55%)",
-              fillOpacity: 0.5,
-              weight: 2.5,
+              fillOpacity: 0.55,
             }}
           />
         )}
 
-        <MapController bounds={bounds} center={country.latlng} />
+        {showLocator && (
+          <>
+            <CircleMarker
+              center={country.latlng}
+              radius={16}
+              pathOptions={{
+                color: "hsl(0, 72%, 45%)",
+                fillColor: "hsl(0, 78%, 55%)",
+                fillOpacity: 0.25,
+                weight: 0,
+              }}
+            />
+            <CircleMarker
+              center={country.latlng}
+              radius={6}
+              pathOptions={{
+                color: "white",
+                fillColor: "hsl(0, 78%, 50%)",
+                fillOpacity: 1,
+                weight: 2,
+              }}
+            />
+          </>
+        )}
+
+        <MapController plan={plan} />
       </MapContainer>
     </div>
   );
