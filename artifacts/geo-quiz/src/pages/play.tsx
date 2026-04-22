@@ -1,0 +1,256 @@
+import { useEffect } from "react";
+import { useLocation, useParams } from "wouter";
+import { useCountries, useGeoJson, type Country } from "@/lib/countries";
+import { useGame, type GameMode } from "@/hooks/use-game";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CountryMap } from "@/components/country-map";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+const modeTitles: Record<GameMode, string> = {
+  flag_to_country: "Угадай страну",
+  country_to_capital: "Угадай столицу",
+  country_to_flag: "Угадай флаг",
+  capital_to_country: "Угадай страну",
+};
+
+export default function Play() {
+  const { mode } = useParams<{ mode: string }>();
+  const validMode = (mode as GameMode) || "flag_to_country";
+  const [, setLocation] = useLocation();
+
+  const { data: countries, isLoading, isError, refetch } = useCountries();
+  const { data: geoJson } = useGeoJson();
+
+  const {
+    questions,
+    currentIdx,
+    score,
+    selectedOption,
+    isGameOver,
+    initGame,
+    handleSelect,
+    nextQuestion,
+    currentQuestion,
+  } = useGame(countries, validMode);
+
+  useEffect(() => {
+    if (countries && questions.length === 0) {
+      initGame();
+    }
+  }, [countries, questions.length, initGame]);
+
+  useEffect(() => {
+    if (isGameOver) {
+      setLocation(`/result?score=${score}&total=${questions.length}`);
+    }
+  }, [isGameOver, score, questions.length, setLocation]);
+
+  if (isLoading || questions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[100dvh] p-6 space-y-4">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-muted-foreground animate-pulse">Загрузка вопросов...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[100dvh] p-6 space-y-4 text-center">
+        <p className="text-destructive font-medium">Ошибка загрузки данных</p>
+        <Button onClick={() => refetch()}>Повторить</Button>
+        <Button variant="outline" onClick={() => setLocation("/")}>На главную</Button>
+      </div>
+    );
+  }
+
+  if (!currentQuestion) return null;
+
+  const { correctCountry, options } = currentQuestion;
+
+  const getOptionStyle = (option: Country) => {
+    if (!selectedOption) return "bg-card hover:bg-accent/10 border-border cursor-pointer hover-elevate";
+    
+    if (option.cca3 === correctCountry.cca3) {
+      return "bg-green-500/10 border-green-500 text-green-700 dark:text-green-400 font-semibold";
+    }
+    
+    if (selectedOption.cca3 === option.cca3) {
+      return "bg-destructive/10 border-destructive text-destructive font-semibold";
+    }
+    
+    return "bg-card border-border opacity-50";
+  };
+
+  const renderQuestionContent = () => {
+    switch (validMode) {
+      case "flag_to_country":
+        return (
+          <div className="flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-bottom-4">
+            <div className="w-48 h-32 rounded-lg shadow-md overflow-hidden bg-muted">
+              <img src={correctCountry.flags.svg} alt="Флаг" className="w-full h-full object-cover" />
+            </div>
+            <div className="w-full grid grid-cols-1 gap-3">
+              {options.map((opt) => (
+                <Card 
+                  key={opt.cca3}
+                  className={cn("transition-all duration-300", getOptionStyle(opt))}
+                  onClick={() => handleSelect(opt)}
+                >
+                  <CardContent className="p-4 text-center text-lg">
+                    {opt.nameRu}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+      case "country_to_capital":
+        return (
+          <div className="flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-bottom-4">
+            <h2 className="text-3xl font-serif font-bold text-center">{correctCountry.nameRu}</h2>
+            <div className="w-full grid grid-cols-1 gap-3">
+              {options.map((opt) => (
+                <Card 
+                  key={opt.cca3}
+                  className={cn("transition-all duration-300", getOptionStyle(opt))}
+                  onClick={() => handleSelect(opt)}
+                >
+                  <CardContent className="p-4 text-center text-lg">
+                    {opt.capitalRu}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+      case "country_to_flag":
+        return (
+          <div className="flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-bottom-4">
+            <h2 className="text-3xl font-serif font-bold text-center">{correctCountry.nameRu}</h2>
+            <div className="w-full grid grid-cols-2 gap-4">
+              {options.map((opt) => (
+                <Card 
+                  key={opt.cca3}
+                  className={cn("transition-all duration-300 overflow-hidden", getOptionStyle(opt))}
+                  onClick={() => handleSelect(opt)}
+                >
+                  <div className="h-24 w-full bg-muted">
+                    <img src={opt.flags.svg} alt="Флаг" className="w-full h-full object-cover" />
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+      case "capital_to_country":
+        return (
+          <div className="flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-bottom-4">
+            <h2 className="text-3xl font-serif font-bold text-center">{correctCountry.capitalRu}</h2>
+            <div className="w-full grid grid-cols-1 gap-3">
+              {options.map((opt) => (
+                <Card 
+                  key={opt.cca3}
+                  className={cn("transition-all duration-300", getOptionStyle(opt))}
+                  onClick={() => handleSelect(opt)}
+                >
+                  <CardContent className="p-4 text-center text-lg">
+                    {opt.nameRu}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+    }
+  };
+
+  const getFeedbackDescription = () => {
+    const { nameRu, capitalRu, regionRu, borders } = correctCountry;
+    
+    let neighborsStr = "";
+    if (borders && borders.length > 0) {
+      const neighborNames = borders.map(b => {
+        const n = countries?.find(c => c.cca3 === b);
+        return n ? n.nameRu : null;
+      }).filter(Boolean);
+      
+      if (neighborNames.length > 0) {
+        neighborsStr = `, граничит с ${neighborNames.join(", ")}`;
+      }
+    }
+
+    let prefix = "";
+    if (validMode === "flag_to_country") prefix = `Флаг ${nameRu} — `;
+    else if (validMode === "country_to_capital") prefix = `Столица ${nameRu} — ${capitalRu}. `;
+    else if (validMode === "capital_to_country") prefix = `${capitalRu} — столица ${nameRu}. `;
+    else prefix = `${nameRu} — `;
+
+    return `${prefix}${nameRu} находится в ${regionRu}${neighborsStr}. Столица — ${capitalRu}.`;
+  };
+
+  return (
+    <div className="min-h-[100dvh] w-full max-w-md mx-auto flex flex-col p-4 sm:p-6 pb-24">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8 pt-4">
+        <Button variant="ghost" size="icon" onClick={() => setLocation("/")} className="rounded-full">
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
+        <div className="text-center">
+          <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            {modeTitles[validMode]}
+          </div>
+          <div className="text-sm font-bold text-primary mt-1">
+            {currentIdx + 1} / {questions.length}
+          </div>
+        </div>
+        <div className="w-10" /> {/* Spacer for balance */}
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {renderQuestionContent()}
+
+        {/* Feedback Panel */}
+        {selectedOption && (
+          <div className="mt-8 space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-500 pb-8">
+            <div className="bg-secondary/50 rounded-xl p-5 border border-secondary text-secondary-foreground leading-relaxed shadow-sm">
+              {getFeedbackDescription()}
+            </div>
+            
+            <div className="rounded-xl overflow-hidden border border-border shadow-sm">
+              <CountryMap 
+                country={correctCountry} 
+                geoJson={geoJson} 
+                neighbors={(countries || []).filter(c => correctCountry.borders?.includes(c.cca3))} 
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Next Button pinned to bottom */}
+      {selectedOption && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t z-10 flex justify-center">
+          <div className="w-full max-w-md">
+            <Button 
+              size="lg" 
+              className="w-full h-14 text-lg rounded-xl shadow-lg" 
+              onClick={nextQuestion}
+            >
+              {currentIdx + 1 === questions.length ? "Завершить" : "Дальше"}
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
