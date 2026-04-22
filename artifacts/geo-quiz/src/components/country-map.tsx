@@ -71,15 +71,12 @@ export function CountryMap({ country, geoJson }: CountryMapProps) {
   if (!bounds || !bounds.isValid()) {
     plan = { kind: "center", bounds: null, center: country.latlng, zoom: 4 };
   } else if (span < 1.5) {
-    plan = { kind: "center", bounds, center: country.latlng, zoom: 5 };
+    plan = { kind: "center", bounds, center: country.latlng, zoom: 4 };
   } else if (span < 4) {
     plan = { kind: "center", bounds, center: country.latlng, zoom: 5 };
   } else {
     plan = { kind: "fit", bounds, center: country.latlng, zoom: 4 };
   }
-
-  // For tiny/island countries, also draw a visible marker so it's findable at a wider zoom
-  const showLocator = !feature || span < 4;
 
   return (
     <div className="h-[300px] w-full relative z-0 overflow-hidden isolate">
@@ -113,29 +110,17 @@ export function CountryMap({ country, geoJson }: CountryMapProps) {
           />
         )}
 
-        {showLocator && (
-          <>
-            <CircleMarker
-              center={country.latlng}
-              radius={16}
-              pathOptions={{
-                color: "hsl(0, 72%, 45%)",
-                fillColor: "hsl(0, 78%, 55%)",
-                fillOpacity: 0.25,
-                weight: 0,
-              }}
-            />
-            <CircleMarker
-              center={country.latlng}
-              radius={6}
-              pathOptions={{
-                color: "white",
-                fillColor: "hsl(0, 78%, 50%)",
-                fillOpacity: 1,
-                weight: 2,
-              }}
-            />
-          </>
+        {!feature && (
+          <CircleMarker
+            center={country.latlng}
+            radius={10}
+            pathOptions={{
+              color: "hsl(0, 72%, 45%)",
+              fillColor: "hsl(0, 78%, 55%)",
+              fillOpacity: 0.55,
+              weight: 2,
+            }}
+          />
         )}
 
         <MapController plan={plan} />
