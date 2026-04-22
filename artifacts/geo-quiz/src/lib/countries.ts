@@ -26,6 +26,8 @@ export interface Country {
   capitalRu: string;
   regionRu: string;
   subregionRu: string;
+  flagUrl: string;
+  flagUrlSmall: string;
 }
 
 export interface GeoJson {
@@ -41,8 +43,8 @@ export interface GeoJson {
   }>;
 }
 
-const COUNTRIES_URL = "https://restcountries.com/v3.1/all?fields=name,capital,cca3,flags,translations,latlng,region,subregion,borders";
-const COUNTRIES_FALLBACK_URL = "https://restcountries.com/v3.1/independent?status=true&fields=name,capital,cca3,flags,translations,latlng,region,subregion,borders";
+const COUNTRIES_URL = "https://restcountries.com/v3.1/all?fields=name,capital,cca2,cca3,flags,translations,latlng,region,subregion,borders";
+const COUNTRIES_FALLBACK_URL = "https://restcountries.com/v3.1/independent?status=true&fields=name,capital,cca2,cca3,flags,translations,latlng,region,subregion,borders";
 const GEOJSON_URL = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson";
 
 async function fetchCountries(): Promise<Country[]> {
@@ -64,6 +66,8 @@ async function fetchCountries(): Promise<Country[]> {
       capitalRu: getCapitalRu(c.cca3, c.capital[0]),
       regionRu: getRegionRu(c.region),
       subregionRu: getSubregionRu(c.subregion),
+      flagUrl: c.cca2 ? `https://flagcdn.com/${c.cca2.toLowerCase()}.svg` : c.flags.svg,
+      flagUrlSmall: c.cca2 ? `https://flagcdn.com/w320/${c.cca2.toLowerCase()}.png` : c.flags.png,
     }))
     .sort((a, b) => a.nameRu.localeCompare(b.nameRu));
 }

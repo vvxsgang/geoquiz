@@ -65,8 +65,8 @@ export default function Learn() {
             onClick={() => setSelected(c)}
           >
             <CardContent className="p-4 flex items-center gap-4">
-              <div className="w-12 h-8 rounded shadow-sm overflow-hidden flex-shrink-0 bg-muted">
-                <img src={c.flags.png} alt={c.flags.alt} className="w-full h-full object-cover" />
+              <div className="w-12 h-8 rounded shadow-sm overflow-hidden flex-shrink-0 bg-white ring-1 ring-border flex items-center justify-center">
+                <img src={c.flagUrlSmall} alt={c.flags.alt} className="w-full h-full object-contain" loading="lazy" />
               </div>
               <div>
                 <h3 className="font-semibold">{c.nameRu}</h3>
@@ -92,10 +92,9 @@ export default function Learn() {
         <DialogContent className="sm:max-w-md max-h-[90dvh] overflow-y-auto p-0 gap-0">
           {selected && (
             <div className="flex flex-col">
-              <div className="w-full h-48 bg-muted relative">
-                <img src={selected.flags.png} alt={selected.flags.alt} className="w-full h-full object-cover opacity-90" />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
-                <div className="absolute bottom-4 left-6">
+              <div className="w-full bg-white relative flex items-center justify-center p-6 pb-14 border-b">
+                <img src={selected.flagUrl} alt={selected.flags.alt} className="w-auto h-32 max-w-full object-contain shadow-md ring-1 ring-border rounded" />
+                <div className="absolute bottom-3 left-6">
                   <DialogTitle className="text-2xl font-serif text-foreground">{selected.nameRu}</DialogTitle>
                 </div>
               </div>

@@ -95,8 +95,13 @@ export default function Play() {
       case "flag_to_country":
         return (
           <div className="flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-bottom-4">
-            <div className="w-48 h-32 rounded-lg shadow-md overflow-hidden bg-muted">
-              <img src={correctCountry.flags.png} alt="Флаг" className="w-full h-full object-cover" />
+            <div className="w-56 aspect-[3/2] rounded-lg shadow-md overflow-hidden bg-white ring-1 ring-border flex items-center justify-center">
+              <img
+                src={correctCountry.flagUrl}
+                alt="Флаг"
+                className="w-full h-full object-contain"
+                loading="eager"
+              />
             </div>
             <div className="w-full grid grid-cols-1 gap-3">
               {options.map((opt) => (
@@ -154,8 +159,8 @@ export default function Play() {
                       answered && !isCorrect && !isPicked && "ring-2 ring-border opacity-40 grayscale",
                     )}
                   >
-                    <div className="h-24 w-full">
-                      <img src={opt.flags.png} alt="Флаг" className="w-full h-full object-cover" />
+                    <div className="aspect-[3/2] w-full bg-white flex items-center justify-center">
+                      <img src={opt.flagUrl} alt="Флаг" className="w-full h-full object-contain" loading="eager" />
                     </div>
                     {answered && isCorrect && (
                       <div className="absolute inset-0 flex items-center justify-center bg-green-500/30">

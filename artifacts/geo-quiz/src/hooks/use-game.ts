@@ -51,7 +51,7 @@ export function useGame(countries: Country[] | undefined, mode: GameMode) {
         if (seen.has(opt.cca3)) continue;
         seen.add(opt.cca3);
         const img = new Image();
-        img.src = opt.flags.png;
+        img.src = opt.flagUrl;
       }
     }
   };
