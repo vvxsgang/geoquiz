@@ -12,12 +12,28 @@ interface CountryMapProps {
 function MapController({ bounds, center }: { bounds: L.LatLngBounds | null; center: [number, number] }) {
   const map = useMap();
   useEffect(() => {
-    if (bounds && bounds.isValid()) {
-      map.fitBounds(bounds.pad(0.55), { animate: true, maxZoom: 6 });
-    } else {
-      map.setView(center, 4, { animate: true });
+    let cancelled = false;
+    try {
+      if (bounds && bounds.isValid()) {
+        map.fitBounds(bounds.pad(0.55), { animate: true, maxZoom: 6 });
+      } else {
+        map.setView(center, 4, { animate: true });
+      }
+    } catch {
+      // map may be tearing down
     }
-    setTimeout(() => map.invalidateSize(), 50);
+    const t = setTimeout(() => {
+      if (cancelled) return;
+      try {
+        map.invalidateSize();
+      } catch {
+        // map unmounted before timer fired
+      }
+    }, 50);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, [map, bounds, center]);
   return null;
 }
