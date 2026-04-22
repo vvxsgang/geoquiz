@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CountryMap } from "@/components/country-map";
 import { ArrowLeft, Loader2, Check, X } from "lucide-react";
+import { getFactRu } from "@/lib/facts";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -231,27 +232,33 @@ export default function Play() {
   };
 
   const getFeedbackDescription = () => {
-    const { nameRu, capitalRu, regionRu, borders } = correctCountry;
-    
-    let neighborsStr = "";
-    if (borders && borders.length > 0) {
-      const neighborNames = borders.map(b => {
-        const n = countries?.find(c => c.cca3 === b);
-        return n ? n.nameRu : null;
-      }).filter(Boolean);
-      
-      if (neighborNames.length > 0) {
-        neighborsStr = `, граничит с ${neighborNames.join(", ")}`;
+    const { nameRu, capitalRu, regionRu, cca3, borders } = correctCountry;
+
+    let intro = "";
+    if (validMode === "flag_to_country") intro = `Это флаг ${nameRu}.`;
+    else if (validMode === "country_to_capital") intro = `Столица ${nameRu} — ${capitalRu}.`;
+    else if (validMode === "capital_to_country") intro = `${capitalRu} — столица ${nameRu}.`;
+    else intro = `Это флаг ${nameRu}.`;
+
+    const fact = getFactRu(cca3);
+    let tail: string;
+    if (fact) {
+      tail = fact;
+    } else {
+      // Фолбэк, если факта о стране нет — короткая справка с соседями
+      let neighborsStr = "";
+      if (borders && borders.length > 0) {
+        const neighborNames = borders
+          .map((b) => countries?.find((c) => c.cca3 === b)?.nameRu)
+          .filter(Boolean);
+        if (neighborNames.length > 0) {
+          neighborsStr = ` Граничит с ${neighborNames.join(", ")}.`;
+        }
       }
+      tail = `Находится в ${regionRu}.${neighborsStr} Столица — ${capitalRu}.`;
     }
 
-    let prefix = "";
-    if (validMode === "flag_to_country") prefix = `Флаг ${nameRu} — `;
-    else if (validMode === "country_to_capital") prefix = `Столица ${nameRu} — ${capitalRu}. `;
-    else if (validMode === "capital_to_country") prefix = `${capitalRu} — столица ${nameRu}. `;
-    else prefix = `${nameRu} — `;
-
-    return `${prefix}${nameRu} находится в ${regionRu}${neighborsStr}. Столица — ${capitalRu}.`;
+    return `${intro} ${tail}`;
   };
 
   return (
