@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { MapContainer, TileLayer, GeoJSON, Marker, useMap, CircleMarker } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, useMap, CircleMarker } from "react-leaflet";
 import L from "leaflet";
 import type { Country, GeoJson } from "../lib/countries";
 
@@ -22,20 +22,7 @@ function MapController({ bounds, center }: { bounds: L.LatLngBounds | null; cent
   return null;
 }
 
-function makeLabel(text: string, variant: "primary" | "neighbor") {
-  const cls =
-    variant === "primary"
-      ? "geo-label geo-label-primary"
-      : "geo-label geo-label-neighbor";
-  return L.divIcon({
-    className: "",
-    html: `<div class="${cls}">${text}</div>`,
-    iconSize: [120, 20],
-    iconAnchor: [60, 10],
-  });
-}
-
-export function CountryMap({ country, geoJson, neighbors }: CountryMapProps) {
+export function CountryMap({ country, geoJson }: CountryMapProps) {
   const feature = geoJson?.features.find(
     (f) =>
       f.properties.ISO_A3 === country.cca3 ||
@@ -44,9 +31,6 @@ export function CountryMap({ country, geoJson, neighbors }: CountryMapProps) {
   );
 
   const bounds = feature ? L.geoJSON(feature as any).getBounds() : null;
-  const labelCenter: [number, number] = bounds && bounds.isValid()
-    ? [bounds.getCenter().lat, bounds.getCenter().lng]
-    : country.latlng;
 
   return (
     <div className="h-[300px] w-full relative z-0 overflow-hidden isolate">
@@ -64,7 +48,7 @@ export function CountryMap({ country, geoJson, neighbors }: CountryMapProps) {
       >
         <TileLayer
           attribution='&copy; CARTO'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           subdomains={["a", "b", "c", "d"]}
         />
 
@@ -90,17 +74,6 @@ export function CountryMap({ country, geoJson, neighbors }: CountryMapProps) {
             }}
           />
         )}
-
-        <Marker position={labelCenter} icon={makeLabel(country.nameRu, "primary")} interactive={false} />
-
-        {neighbors.map((neighbor) => (
-          <Marker
-            key={neighbor.cca3}
-            position={neighbor.latlng}
-            icon={makeLabel(neighbor.nameRu, "neighbor")}
-            interactive={false}
-          />
-        ))}
 
         <MapController bounds={bounds} center={country.latlng} />
       </MapContainer>
