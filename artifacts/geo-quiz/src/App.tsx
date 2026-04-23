@@ -6,6 +6,8 @@ import Home from "@/pages/home";
 import Play from "@/pages/play";
 import Result from "@/pages/result";
 import Learn from "@/pages/learn";
+import Chaos from "@/pages/chaos";
+import Leaderboard from "@/pages/leaderboard";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -17,6 +19,8 @@ function Router() {
       <Route path="/play/:mode" component={Play} />
       <Route path="/result" component={Result} />
       <Route path="/learn" component={Learn} />
+      <Route path="/chaos" component={Chaos} />
+      <Route path="/leaderboard" component={Leaderboard} />
       <Route component={NotFound} />
     </Switch>
   );

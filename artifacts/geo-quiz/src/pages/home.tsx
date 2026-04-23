@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
-import { Flag, MapPin, Globe2, BookOpen, Building2, ChevronRight } from "lucide-react";
+import { Flag, MapPin, Globe2, BookOpen, Building2, ChevronRight, Flame, Trophy } from "lucide-react";
 
 const modes = [
   {
@@ -44,6 +44,26 @@ export default function Home() {
         <p className="text-muted-foreground text-base">Проверь свои знания о мире</p>
       </div>
 
+      <div className="w-full max-w-md mb-3">
+        <Link href="/chaos">
+          <Card className="hover-elevate cursor-pointer border-transparent bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-md transition-all group">
+            <CardContent className="flex items-center p-5 gap-4">
+              <div className="p-3 rounded-xl shrink-0 bg-white/20 backdrop-blur-sm">
+                <Flame className="w-6 h-6" strokeWidth={2} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg leading-tight">Хаос</h3>
+                  <span className="text-[10px] uppercase tracking-wider bg-white/25 px-1.5 py-0.5 rounded font-bold">new</span>
+                </div>
+                <p className="text-sm text-white/85">3 жизни · все режимы · на счёт</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-0.5 transition-all" />
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
       <div className="w-full max-w-md grid grid-cols-1 gap-3">
         {modes.map(({ href, title, sub, icon: Icon, iconBg }) => (
           <Link key={href} href={href}>
@@ -63,12 +83,20 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="w-full max-w-md mt-6">
+      <div className="w-full max-w-md mt-6 grid grid-cols-2 gap-3">
         <Link href="/learn" className="w-full">
-          <Card className="bg-secondary/40 hover:bg-secondary border-transparent cursor-pointer transition-colors">
+          <Card className="bg-secondary/40 hover:bg-secondary border-transparent cursor-pointer transition-colors h-full">
             <CardContent className="flex items-center justify-center p-4 gap-2">
               <BookOpen className="w-5 h-5 text-secondary-foreground" />
-              <span className="font-medium text-secondary-foreground">Изучение стран</span>
+              <span className="font-medium text-secondary-foreground">Изучение</span>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/leaderboard" className="w-full">
+          <Card className="bg-secondary/40 hover:bg-secondary border-transparent cursor-pointer transition-colors h-full">
+            <CardContent className="flex items-center justify-center p-4 gap-2">
+              <Trophy className="w-5 h-5 text-secondary-foreground" />
+              <span className="font-medium text-secondary-foreground">Лидеры</span>
             </CardContent>
           </Card>
         </Link>
