@@ -232,33 +232,12 @@ export default function Play() {
   };
 
   const getFeedbackDescription = () => {
-    const { nameRu, capitalRu, regionRu, cca3, borders } = correctCountry;
+    const { nameRu, capitalRu, regionRu, cca3 } = correctCountry;
 
-    let intro = "";
-    if (validMode === "flag_to_country") intro = `Это флаг ${nameRu}.`;
-    else if (validMode === "country_to_capital") intro = `Столица ${nameRu} — ${capitalRu}.`;
-    else if (validMode === "capital_to_country") intro = `${capitalRu} — столица ${nameRu}.`;
-    else intro = `Это флаг ${nameRu}.`;
-
+    const intro = `${nameRu} — страна в регионе ${regionRu}. Столица — ${capitalRu}.`;
     const fact = getFactRu(cca3);
-    let tail: string;
-    if (fact) {
-      tail = fact;
-    } else {
-      // Фолбэк, если факта о стране нет — короткая справка с соседями
-      let neighborsStr = "";
-      if (borders && borders.length > 0) {
-        const neighborNames = borders
-          .map((b) => countries?.find((c) => c.cca3 === b)?.nameRu)
-          .filter(Boolean);
-        if (neighborNames.length > 0) {
-          neighborsStr = ` Граничит с ${neighborNames.join(", ")}.`;
-        }
-      }
-      tail = `Находится в ${regionRu}.${neighborsStr} Столица — ${capitalRu}.`;
-    }
 
-    return `${intro} ${tail}`;
+    return fact ? `${intro} ${fact}` : intro;
   };
 
   return (
