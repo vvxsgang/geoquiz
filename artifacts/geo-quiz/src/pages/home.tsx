@@ -1,72 +1,71 @@
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
-import { Flag, MapPin, Globe2, BookOpen } from "lucide-react";
+import { Flag, MapPin, Globe2, BookOpen, Building2, ChevronRight } from "lucide-react";
+
+const modes = [
+  {
+    href: "/play/flag_to_country",
+    title: "Угадай страну",
+    sub: "по флагу",
+    icon: Flag,
+    iconBg: "bg-rose-500/15 text-rose-600",
+  },
+  {
+    href: "/play/country_to_capital",
+    title: "Угадай столицу",
+    sub: "по стране",
+    icon: Building2,
+    iconBg: "bg-amber-500/15 text-amber-600",
+  },
+  {
+    href: "/play/country_to_flag",
+    title: "Угадай флаг",
+    sub: "по стране",
+    icon: Globe2,
+    iconBg: "bg-teal-500/15 text-teal-600",
+  },
+  {
+    href: "/play/capital_to_country",
+    title: "Угадай страну",
+    sub: "по столице",
+    icon: MapPin,
+    iconBg: "bg-violet-500/15 text-violet-600",
+  },
+];
 
 export default function Home() {
   return (
-    <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center p-6 space-y-12">
-      <div className="text-center space-y-3">
+    <div className="min-h-[100dvh] w-full flex flex-col items-center p-6 pt-14 pb-10">
+      <div className="text-center space-y-2 mb-10">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary mb-3 shadow-sm">
+          <Globe2 className="w-9 h-9" strokeWidth={1.75} />
+        </div>
         <h1 className="text-5xl font-serif text-primary font-bold tracking-tight">ГеоКвиз</h1>
-        <p className="text-muted-foreground text-lg">Проверь свои знания о мире</p>
+        <p className="text-muted-foreground text-base">Проверь свои знания о мире</p>
       </div>
 
-      <div className="w-full max-w-md grid grid-cols-1 gap-4">
-        <Link href="/play/flag_to_country">
-          <Card className="hover-elevate cursor-pointer border-transparent transition-colors">
-            <CardContent className="flex items-center p-6 gap-4">
-              <div className="bg-primary/10 p-3 rounded-full text-primary">
-                <Flag className="w-6 h-6" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg">Угадай страну по флагу</h3>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        
-        <Link href="/play/country_to_capital">
-          <Card className="hover-elevate cursor-pointer border-transparent transition-colors">
-            <CardContent className="flex items-center p-6 gap-4">
-              <div className="bg-primary/10 p-3 rounded-full text-primary">
-                <MapPin className="w-6 h-6" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg">Угадай столицу по стране</h3>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href="/play/country_to_flag">
-          <Card className="hover-elevate cursor-pointer border-transparent transition-colors">
-            <CardContent className="flex items-center p-6 gap-4">
-              <div className="bg-primary/10 p-3 rounded-full text-primary">
-                <Globe2 className="w-6 h-6" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg">Угадай флаг по стране</h3>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href="/play/capital_to_country">
-          <Card className="hover-elevate cursor-pointer border-transparent transition-colors">
-            <CardContent className="flex items-center p-6 gap-4">
-              <div className="bg-primary/10 p-3 rounded-full text-primary">
-                <MapPin className="w-6 h-6" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg">Угадай страну по столице</h3>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+      <div className="w-full max-w-md grid grid-cols-1 gap-3">
+        {modes.map(({ href, title, sub, icon: Icon, iconBg }) => (
+          <Link key={href} href={href}>
+            <Card className="hover-elevate cursor-pointer border-card-border transition-all group">
+              <CardContent className="flex items-center p-5 gap-4">
+                <div className={`p-3 rounded-xl shrink-0 ${iconBg}`}>
+                  <Icon className="w-6 h-6" strokeWidth={2} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg leading-tight">{title}</h3>
+                  <p className="text-sm text-muted-foreground">{sub}</p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
       </div>
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md mt-6">
         <Link href="/learn" className="w-full">
-          <Card className="bg-secondary/50 hover:bg-secondary border-transparent cursor-pointer transition-colors">
+          <Card className="bg-secondary/40 hover:bg-secondary border-transparent cursor-pointer transition-colors">
             <CardContent className="flex items-center justify-center p-4 gap-2">
               <BookOpen className="w-5 h-5 text-secondary-foreground" />
               <span className="font-medium text-secondary-foreground">Изучение стран</span>
@@ -74,6 +73,10 @@ export default function Home() {
           </Card>
         </Link>
       </div>
+
+      <p className="mt-auto pt-10 text-xs text-muted-foreground/60 text-center">
+        Данные: restcountries.com · flagcdn.com
+      </p>
     </div>
   );
 }

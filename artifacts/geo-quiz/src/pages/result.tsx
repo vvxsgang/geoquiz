@@ -1,33 +1,50 @@
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Trophy } from "lucide-react";
+import { Trophy, Sparkles, Heart, ThumbsUp } from "lucide-react";
+
+function getVerdict(pct: number) {
+  if (pct === 100) return { label: "Идеально!", desc: "Ты знаешь мир как свои пять пальцев.", icon: Trophy, color: "text-amber-500", bg: "bg-amber-500/15" };
+  if (pct >= 80) return { label: "Отлично!", desc: "Совсем немного — и идеал.", icon: Sparkles, color: "text-teal-600", bg: "bg-teal-500/15" };
+  if (pct >= 50) return { label: "Неплохо", desc: "Можно лучше — попробуй ещё раз.", icon: ThumbsUp, color: "text-violet-600", bg: "bg-violet-500/15" };
+  return { label: "Не сдавайся", desc: "Каждый раунд — это шаг к успеху.", icon: Heart, color: "text-rose-500", bg: "bg-rose-500/15" };
+}
 
 export default function Result() {
-  const [location] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const score = parseInt(searchParams.get("score") || "0", 10);
   const total = parseInt(searchParams.get("total") || "10", 10);
+  const pct = total > 0 ? Math.round((score / total) * 100) : 0;
+  const v = getVerdict(pct);
+  const Icon = v.icon;
 
   return (
-    <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center p-6 space-y-8 animate-in fade-in zoom-in duration-500">
-      <div className="bg-accent/20 p-6 rounded-full text-accent mb-4">
-        <Trophy className="w-16 h-16" />
-      </div>
-      
-      <div className="text-center space-y-2">
-        <h1 className="text-4xl font-serif font-bold">Результат</h1>
-        <p className="text-lg text-muted-foreground">
-          Вы ответили правильно на
-        </p>
-        <div className="text-5xl font-bold text-primary py-4">
-          {score} из {total}
-        </div>
+    <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center p-6 space-y-6 animate-in fade-in zoom-in duration-500">
+      <div className={`p-6 rounded-3xl ${v.bg} ${v.color} shadow-sm`}>
+        <Icon className="w-16 h-16" strokeWidth={1.75} />
       </div>
 
-      <div className="w-full max-w-sm space-y-4 pt-8">
-        <Button className="w-full h-14 text-lg rounded-xl" asChild>
-          <button onClick={() => window.history.back()}>Играть ещё раз</button>
+      <div className="text-center space-y-1">
+        <h1 className="text-4xl font-serif font-bold">{v.label}</h1>
+        <p className="text-base text-muted-foreground">{v.desc}</p>
+      </div>
+
+      <div className="w-full max-w-xs bg-card border border-card-border rounded-2xl p-6 shadow-sm text-center space-y-3">
+        <div className="text-sm text-muted-foreground uppercase tracking-wider">Результат</div>
+        <div className="text-5xl font-bold text-primary">
+          {score}<span className="text-2xl text-muted-foreground font-normal"> / {total}</span>
+        </div>
+        <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-700 ${pct >= 80 ? "bg-teal-500" : pct >= 50 ? "bg-amber-500" : "bg-rose-500"}`}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        <div className="text-sm text-muted-foreground">{pct}% правильных ответов</div>
+      </div>
+
+      <div className="w-full max-w-sm space-y-3 pt-4">
+        <Button className="w-full h-14 text-lg rounded-xl shadow-sm" onClick={() => window.history.back()}>
+          Играть ещё раз
         </Button>
         <Link href="/">
           <Button variant="secondary" className="w-full h-14 text-lg rounded-xl">

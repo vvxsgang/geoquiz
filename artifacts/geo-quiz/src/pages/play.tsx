@@ -57,8 +57,10 @@ export default function Play() {
   if (isLoading || questions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[100dvh] p-6 space-y-4">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <p className="text-muted-foreground animate-pulse">Загрузка вопросов...</p>
+        <div className="p-4 rounded-2xl bg-primary/10">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+        <p className="text-muted-foreground">Готовим вопросы…</p>
       </div>
     );
   }
@@ -240,22 +242,35 @@ export default function Play() {
     return fact ? `${intro} ${fact}` : intro;
   };
 
+  const progress = questions.length > 0 ? ((currentIdx + (selectedOption ? 1 : 0)) / questions.length) * 100 : 0;
+
   return (
     <div className="min-h-[100dvh] w-full max-w-md mx-auto flex flex-col p-4 sm:p-6 pb-24">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8 pt-4">
+      <div className="flex items-center justify-between mb-3 pt-4">
         <Button variant="ghost" size="icon" onClick={() => setLocation("/")} className="rounded-full">
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="text-center">
-          <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
             {modeTitles[validMode]}
           </div>
-          <div className="text-sm font-bold text-primary mt-1">
-            {currentIdx + 1} / {questions.length}
+          <div className="text-sm font-bold text-foreground mt-0.5">
+            <span className="text-primary">{currentIdx + 1}</span>
+            <span className="text-muted-foreground"> / {questions.length}</span>
           </div>
         </div>
-        <div className="w-10" /> {/* Spacer for balance */}
+        <div className="text-sm font-semibold text-primary tabular-nums w-10 text-right">
+          {score}
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden mb-6">
+        <div
+          className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
       {/* Main Content */}
