@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Trophy, Trash2 } from "lucide-react";
-import { loadLeaderboard, clearLeaderboard, type LeaderboardEntry } from "@/lib/leaderboard";
+import { ArrowLeft, Trophy } from "lucide-react";
+import { loadLeaderboard, type LeaderboardEntry } from "@/lib/leaderboard";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-
 function formatDate(ts: number) {
   try {
     return new Date(ts).toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
@@ -17,15 +15,16 @@ function formatDate(ts: number) {
     return "";
   }
 }
-
 export default function Leaderboard() {
   const [, setLocation] = useLocation();
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    setBoard(loadLeaderboard());
+    loadLeaderboard().then((data) => {
+      setBoard(data);
+      setLoading(false);
+    });
   }, []);
-
   return (
     <div className="min-h-[100dvh] w-full max-w-md mx-auto flex flex-col p-6 pt-10 pb-10">
       <div className="flex items-center mb-6">
@@ -35,7 +34,6 @@ export default function Leaderboard() {
         <h1 className="flex-1 text-center text-xl font-serif font-bold">Таблица лидеров</h1>
         <div className="w-10" />
       </div>
-
       <div className="flex flex-col items-center text-center mb-6">
         <div className="p-4 rounded-2xl bg-amber-500/15 text-amber-600 mb-3">
           <Trophy className="w-8 h-8" strokeWidth={1.75} />
@@ -44,9 +42,13 @@ export default function Leaderboard() {
           Лучшие результаты в режиме «Хаос»
         </p>
       </div>
-
       <div className="flex-1 space-y-2">
-        {board.length === 0 && (
+        {loading && (
+          <div className="text-center py-10">
+            <p className="text-muted-foreground">Загрузка...</p>
+          </div>
+        )}
+        {!loading && board.length === 0 && (
           <div className="text-center py-10">
             <p className="text-muted-foreground mb-4">Пока никто не играл в Хаос</p>
             <Link href="/chaos">
@@ -78,22 +80,6 @@ export default function Leaderboard() {
           </div>
         ))}
       </div>
-
-      {board.length > 0 && (
-        <Button
-          variant="ghost"
-          className="mt-4 text-muted-foreground"
-          onClick={() => {
-            if (confirm("Очистить таблицу лидеров?")) {
-              clearLeaderboard();
-              setBoard([]);
-            }
-          }}
-        >
-          <Trash2 className="w-4 h-4 mr-2" />
-          Очистить
-        </Button>
-      )}
     </div>
   );
 }
