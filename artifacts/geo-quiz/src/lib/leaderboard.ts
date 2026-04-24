@@ -4,58 +4,40 @@ export interface LeaderboardEntry {
   date: number;
 }
 
-const STORAGE_KEY = "geo-quiz:leaderboard:chaos:v1";
+const API_URL = import.meta.env.VITE_API_URL ?? "";
 const NICK_KEY = "geo-quiz:nick";
-const MAX_ENTRIES = 50;
 
-export function loadLeaderboard(): LeaderboardEntry[] {
+export async function loadLeaderboard(): Promise<LeaderboardEntry[]> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter(
-        (e): e is LeaderboardEntry =>
-          typeof e?.nick === "string" &&
-          typeof e?.score === "number" &&
-          typeof e?.date === "number",
-      )
-      .sort((a, b) => b.score - a.score || a.date - b.date)
-      .slice(0, MAX_ENTRIES);
+    const res = await fetch(`${API_URL}/api/leaderboard`);
+    if (!res.ok) return [];
+    return await res.json();
   } catch {
     return [];
   }
 }
 
-export function saveScore(entry: Omit<LeaderboardEntry, "date">): LeaderboardEntry[] {
-  const list = loadLeaderboard();
-  const next: LeaderboardEntry = { ...entry, date: Date.now() };
-  list.push(next);
-  list.sort((a, b) => b.score - a.score || a.date - b.date);
-  const trimmed = list.slice(0, MAX_ENTRIES);
+export async function saveScore(entry: Omit<LeaderboardEntry, "date">): Promise<LeaderboardEntry[]> {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+    await fetch(`${API_URL}/api/leaderboard`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...entry, date: Date.now() }),
+    });
+    return await loadLeaderboard();
   } catch {
-    // ignore quota / privacy errors
+    return [];
   }
-  return trimmed;
 }
 
-export function clearLeaderboard() {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    /* noop */
-  }
+export async function clearLeaderboard(): Promise<void> {
+  // локальная очистка больше не нужна
 }
 
 export function rememberNick(nick: string) {
   try {
     localStorage.setItem(NICK_KEY, nick);
-  } catch {
-    /* noop */
-  }
+  } catch {}
 }
 
 export function recallNick(): string {
