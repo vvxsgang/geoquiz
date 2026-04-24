@@ -38,13 +38,14 @@ export default function Chaos() {
   // Auto-end → save score
   useEffect(() => {
     if (chaos.isOver && phase === "playing") {
-      const list = saveScore({ nick: nick.trim() || "Игрок", score: chaos.score });
-      setBoard(list);
-      const idx = list.findIndex(
-        (e) => e.nick === (nick.trim() || "Игрок") && e.score === chaos.score,
-      );
-      setSavedRank(idx >= 0 ? idx + 1 : null);
-      setPhase("over");
+      saveScore({ nick: nick.trim() || "Игрок", score: chaos.score }).then((list) => {
+        setBoard(list);
+        const idx = list.findIndex(
+          (e) => e.nick === (nick.trim() || "Игрок") && e.score === chaos.score,
+        );
+        setSavedRank(idx >= 0 ? idx + 1 : null);
+        setPhase("over");
+      });
     }
   }, [chaos.isOver, chaos.score, nick, phase]);
 
